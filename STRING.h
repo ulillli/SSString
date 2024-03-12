@@ -17,7 +17,7 @@ public:
 			data[n] = '\0';
 		}
 	}
-	String(const String& str) {
+	String(const String & str) {
 		int n = str.Size();
 		if (n == 0) {
 			this->data = new char[n + 1];
@@ -29,7 +29,7 @@ public:
 			data[n] = '\0';
 		}
 	}
-	String(const char* str) {
+	String(const char * str) {
 		int n = culculateSize(str);
 		if (n == 0) {
 			this->data = new char[n + 1];
@@ -40,102 +40,97 @@ public:
 			for (int i = 0; i < n + 1; i++) this->data[i] = str[i];
 		}
 	}
-	String& operator=(const String& str) {
-		delete data;
+
+	String & operator=(const String & str) {
+		delete[] data;
 		int n = str.Size();
 		data = new char[n + 1];
 		for (int i = 0; i < n; i++) this->data[i] = str[i];
 		data[n] = '\0';
 		return *this;
 	}
-	String& operator+=(const String& str) {
+	String & operator+=(const String & str) {
 		if (str.Size() != 0) {
 			int n = this->Size();
-			char* tmp = new char[n + 1];
-			for (int i = 0; i < n; i++) tmp[i] = this->data[i];
-			tmp[n] = '\0';
-			delete data;
 			int newSize = n + str.Size();
-			data = new char[newSize + 1];
+			char * tmp = new char[newSize + 1];
 			int i = 0, j = 0;
-			while (tmp[i] != '\0') {
-				data[i] = tmp[i];
+			while (this->data[i] != '\0') {
+				tmp[i] = data[i];
 				i++;
 			}
-			delete[] tmp;
 			while (str[j] != '\0') {
-				data[i++] = str[j++];
+				tmp[i++] = str[j++];
 			}
-			data[newSize] = '\0';
+			delete[] data;
+			tmp[newSize] = '\0';
+			data = tmp;
 		}
 		return *this;
 
 	}
-	String operator+(const String& str) const {
+	String operator+(const String & str) const {
 		String res = *this;
 		res += str;
 		return res;
 
 	}
-	void insert(int pos, const String& str) {
-		int len1 = this->Size(), len2 = str.Size(), newSize = len1 + len2;
-		char* tmp = new char[len1 + 1];
-		for (int i = 0; i < len1; i++) tmp[i] = this->data[i];
-		tmp[len1] = '\0';
-		delete data;
-		data = new char[newSize + 1];
-		int i = 0, j = 0, k = 0;
-		while (i != pos) {
-			data[i++] = tmp[k++];
-		}
-		while (str[j] != '\0') {
-			data[i++] = str[j++];
-		}
-		while (tmp[k] != '\0') data[i++] = tmp[k++];
-		data[newSize] = '\0';
-		delete tmp;
 
-	}
-	void insert(int pos, int len, const String& str) {
-		int len1 = this->Size(), len2 = len, newSize = len1 + len2;
-		if ((len2 != 0) && (len <= str.Size()) && (pos <= len1)) {
-			char* tmp = new char[len1 + 1];
-			for (int i = 0; i <= len1; i++) {
-				tmp[i] = this->data[i];
-			}
-			delete data;
-			data = new char[newSize + 1];
-			int i = 0, j = 0, k = 0;
+	void insert(int pos, const String & str) {
+		int len1 = this->Size(), len2 = str.Size(), newSize = len1 + len2;
+		char * tmp = new char[newSize + 1];
+		int i = 0, j = 0,k=0;
+		if (pos <=len1) {
 			while (i != pos) {
-				data[i++] = tmp[k++];
+				tmp[i++] = this->data[k++];
 			}
-			while (j != len) {
-				data[i++] = str[j++];
+			while (str[j] != '\0') {
+				tmp[i++] = str[j++];
 			}
-			while (tmp[k] != '\0') data[i++] = tmp[k++];
-			data[newSize] = '\0';
-			delete tmp;
+			while (this->data[k] != '\0') {
+				tmp[i++] = this->data[k++];
+			}
+			tmp[newSize] = '\0';
+			delete[] data;
+			data = tmp;
+		}
+		else throw "Error in function insert\n";
+	}
+	void insert(int pos, int len, const String & str) {
+		int len1 = this->Size(), newSize = len1+len;
+		char * tmp = new char[newSize + 1];
+		int i = 0, j = 0, k = 0;
+		if ((pos < len1)&&(len<=str.Size())) {
+			while (i != pos) {
+				tmp[i++] = this->data[k++];
+			}
+			while (j!=len) {
+				tmp[i++] = str[j++];
+			}
+			while (this->data[k] != '\0') {
+				tmp[i++] = this->data[k++];
+			}
+			tmp[newSize] = '\0';
+			delete[] data;
+			data = tmp;
 		}
 		else throw "Error in function insert\n";
 	}
 	void erase(int pos, int n = 1) {
 		int size = this->Size();
-		if ((pos < size) && ((size - n) >= 0)) {
-			char* tmp = new char[size + 1];
-			for (int i = 0; i < size; i++) tmp[i] = this->data[i];
-			tmp[size] = '\0';
-			delete data;
-			data = new char[size + 1 - n];
+		if ((pos < size-n) && ((size - n) >= 0)) {
+			char * tmp = new char[size+n+1];
 			int i = 0, j = 0;
-			while (i != pos) {
-				data[i++] = tmp[j++];
+			while (j != pos) {
+				tmp[i++] = data[j++];
 			}
 			j = j + n;
-			while (tmp[j] != '\0') {
-				data[i++] = tmp[j++];
+			while (data[j] != '\0') {
+				tmp[i++] = data[j++];
 			}
-			delete tmp;
-			data[size - n] = '\0';
+			tmp[size - n] = '\0';
+			delete[] data;
+			data = tmp;
 		}
 		else throw "Error in function erase\n";
 	}
@@ -155,7 +150,7 @@ public:
 		}
 		else return 0;
 	}
-	int find(const char* subStr) {
+	int find(const char * subStr) {
 		int j = 0;
 		for (char* pstr = this->data; *pstr != '\0'; pstr++, j++) {
 			bool flag = false;
@@ -170,11 +165,11 @@ public:
 		}
 		return -1;
 	}
-	bool operator!=(const String& str) const {
-		if (*this == str) return 0;
+	bool operator!=(const String & str) const {
+		if (*this == str)  return 0;
 		else return 1;
 	}
-	bool operator<(const String& str) const {
+	bool operator<(const String & str) const {
 		int len1 = this->Size(), len2 = str.Size();
 		if (len1 < len2) return 1;
 		if (len1 > len2) return 0;
@@ -187,20 +182,20 @@ public:
 			else return 0;
 		}
 	}
-	bool operator>(const String& str) const {
+	bool operator>(const String & str) const {
 		if ((*this != str) && (not(*this < str))) return 1;
 		else return 0;
 	}
-	bool operator>=(const String& str)const {
+	bool operator>=(const String & str)const {
 		if ((*this == str) || (*this > str)) return 1;
 		else 0;
 	}
-	bool operator<=(const String& str) const {
+	bool operator<=(const String & str) const {
 		if ((*this == str) || (*this < str)) return 1;
 		else 0;
 	}
 	void clear() {
-		delete data;
+		delete[] data;
 		data = new char[1];
 		data[0] = '\0';
 	}
@@ -225,6 +220,6 @@ public:
 		return i - 1;
 	}
 	~String() {
-		delete data;
+		delete[] data;
 	}
 };
